@@ -1,10 +1,14 @@
 package com.project.graphapp3;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -13,9 +17,31 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
+
     public void onClick(View view) {
         Intent intent = new Intent(MainActivity.this, MatrixInput.class);
         startActivity(intent);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // получим идентификатор выбранного пункта меню
+        int id = item.getItemId();
+        // Операции для выбранного пункта меню
+        switch (id) {
+            case R.id.action_settings:
+                return true;
+            case R.id.action_help:
+                return true;
+            case R.id.action_main:
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }

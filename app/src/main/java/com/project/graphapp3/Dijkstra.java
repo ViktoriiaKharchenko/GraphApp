@@ -44,8 +44,9 @@ public class Dijkstra {
             used[v] = true; // помечаем ее
             for (int nv = 0; nv < vNum; nv++)
                 if (!used[nv] && graph[v][nv] < INF) { // для всех непомеченных смежных
+                    if(dist[nv] > dist[v]+graph[v][nv]) prev[nv] = v;
                     dist[nv] = min(dist[nv], dist[v] + graph[v][nv]);
-                    prev[nv] = v;
+
                 }
         }
         Stack stack = new Stack();
