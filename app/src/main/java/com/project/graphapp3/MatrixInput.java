@@ -16,11 +16,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class MatrixInput extends AppCompatActivity {
     TextView textView;
     TextView textViewDist;
     TextView textViewShortPath;
+    TextView textViewAllPaths;
     TextView nodesNumberView;
     EditText editMatrix;
     Button button;
@@ -29,7 +31,10 @@ public class MatrixInput extends AppCompatActivity {
     LinearLayout infoContainer;
     int state = 0;
     int[][] prevMatrix;
+    int [][]adjacencyMatrix;
+    int [][] adjmatrix;
     int[][] matrix;
+    int nodesNum =0;
     int input1 = 0, input2 = 0;
 
     @Override
@@ -37,7 +42,6 @@ public class MatrixInput extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_matrix_input);
         textView = findViewById(R.id.textView2);
-        nodesNumberView = findViewById(R.id.nodesNumberView);
         infoContainer = findViewById(R.id.infoContainer);
         editMatrix = findViewById(R.id.editTextTextMultiLine);
         button = findViewById(R.id.button);
@@ -46,6 +50,7 @@ public class MatrixInput extends AppCompatActivity {
         node2 = findViewById(R.id.editTextNumberDecimal2);
         textViewDist = findViewById(R.id.dist);
         textViewShortPath = findViewById(R.id.path);
+        textViewAllPaths = findViewById(R.id.path2);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -55,10 +60,8 @@ public class MatrixInput extends AppCompatActivity {
             String errorMessage = checkMatrix();
             errorCheck(errorMessage);
         } else {
-
             String errorMessage = checkMatrix();
             if (!compareMatrix()) {
-                state = 0;
                 errorCheck(errorMessage);
             } else {
                 errorMessage = checkNodes();
@@ -74,8 +77,20 @@ public class MatrixInput extends AppCompatActivity {
                             pathText += (" -> " + path[i]);
                         }
                         textViewShortPath.setText(pathText);
+                        AllPaths allPaths = new AllPaths();
+                        textViewAllPaths.setText("All paths : \n");
+
+                        List<List<Integer>> paths = allPaths.allPathsSourceTarget(adjmatrix,input1, input2);
+                        for (List<Integer> p: paths) {
+                            for (Integer node:p ){
+                                if(node == p.get(p.size()-1))
+                                textViewAllPaths.setText(node);
+                                else textViewAllPaths.setText(node +" -> ");
+                            }
+                        }
 //                    state=2;
                     } else textViewDist.setText("There is no path");
+
                 } else {
                     textView.setText(errorMessage);
                     textView.setTextColor(Color.parseColor("#ee3300"));
@@ -102,8 +117,8 @@ public class MatrixInput extends AppCompatActivity {
             prevMatrix = matrix;
             state = 1;
             nodesNumberView.setText("number of nodes : " + matrix.length);
-            node1.setText("");
-            node2.setText("");
+            //node1.setText("");
+            //node2.setText("");
             infoContainer.setVisibility(View.VISIBLE);
         } else {
             textView.setText(errorMessage);
@@ -124,8 +139,8 @@ public class MatrixInput extends AppCompatActivity {
         String[] text = rawMatrixString.split("\n");
         int width = text[0].split(",").length;
         int height = text.length;
-        if (width != height) {
-            errorMessage = "wrong size of matrix!\nwidth and height must be equals\nwidth[" + width + "] height[" + height + "]";
+        if (width != 3) {
+            errorMessage = "wrong size of matrix!\nwidth must be equals 3";
             matrix = null;
             return errorMessage;
         }
@@ -145,11 +160,20 @@ public class MatrixInput extends AppCompatActivity {
                 }
             }
         }
-        matrix = new int[height][width];
+        nodesNum = 4;
+        adjacencyMatrix = new int[height][width];
+        adjmatrix = new int [height][width-1];
+        matrix = new int[nodesNum][nodesNum];
         for (int i = 0; i < height; i++) {
             String[] numbers = text[i].split(",");
             for (int j = 0; j < width; j++) {
-                matrix[i][j] = Integer.parseInt(numbers[j]);
+                adjacencyMatrix[i][j] = Integer.parseInt(numbers[j]);
+            }
+            matrix[adjacencyMatrix[i][0]-1][adjacencyMatrix[i][1]-1] = adjacencyMatrix[i][2];
+        }
+        for (int i =0; i<height; i++){
+            for (int j =0; j<width-1; j++){
+                adjmatrix[i][j] = adjacencyMatrix[i][j];
             }
         }
 
@@ -160,6 +184,7 @@ public class MatrixInput extends AppCompatActivity {
         String errorMessage = null;
         textViewDist.setText("");
         textViewShortPath.setText("");
+        textViewAllPaths.setText("");
         try {
             input1 = Integer.parseInt(node1.getText().toString());
             input2 = Integer.parseInt(node2.getText().toString());
