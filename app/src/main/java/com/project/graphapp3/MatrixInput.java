@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -52,6 +54,34 @@ public class MatrixInput extends AppCompatActivity {
         textViewShortPath = findViewById(R.id.path);
         textViewAllPaths = findViewById(R.id.path2);
         nodesNumberText = findViewById(R.id.numberOfNodes);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // получим идентификатор выбранного пункта меню
+        int id = item.getItemId();
+        Intent intent ;
+        // Операции для выбранного пункта меню
+        switch (id) {
+            case R.id.action_info:
+                intent = new Intent(MatrixInput.this, AboutActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.action_help:
+                intent = new Intent(MatrixInput.this, HelpActivity.class);
+                startActivity(intent);
+                return true;
+            case R.id.action_main:
+                intent = new Intent(MatrixInput.this, MainActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
