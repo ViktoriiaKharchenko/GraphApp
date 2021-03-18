@@ -25,9 +25,11 @@ LineGraphSeries<DataPoint>series1=new LineGraphSeries<>();
         paint.setStrokeWidth(3);
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeCap(Paint.Cap.BUTT);
-        for (int  i = 0;  i < 50;  i++) {
-         x=x+10;
-         y=Math.sin(x);
+        int n = 20;
+        float r = 10;
+        for (int  i = 0;  i < n;  i++) {
+         x=Math.cos(360.0/n)*r;
+         y=Math.sin(360.0/n)*r;
          series1.appendData(new DataPoint(x,y), true,100);
         }
         graphView.addSeries(series1);
