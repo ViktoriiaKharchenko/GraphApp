@@ -1,4 +1,4 @@
-package com.project.graphapp3;
+package com.project.graphapp3.service;
 
 import java.util.Stack;
 

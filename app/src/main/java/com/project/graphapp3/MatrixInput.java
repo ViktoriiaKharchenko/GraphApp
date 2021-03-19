@@ -16,8 +16,10 @@ import android.widget.LinearLayout;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import com.project.graphapp3.model.Path;
+import com.project.graphapp3.service.AllPaths;
+import com.project.graphapp3.service.Dijkstra;
+
 import java.util.List;
 
 public class MatrixInput extends AppCompatActivity {
@@ -38,6 +40,7 @@ public class MatrixInput extends AppCompatActivity {
     int[][] matrix;
     int nodesNum =0;
     int input1 = 0, input2 = 0;
+    List<List<Integer>> paths;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +50,6 @@ public class MatrixInput extends AppCompatActivity {
         infoContainer = findViewById(R.id.infoContainer);
         editMatrix = findViewById(R.id.editTextTextMultiLine);
         button = findViewById(R.id.button);
-        //infoContainer.setVisibility(View.INVISIBLE);
         node1 = findViewById(R.id.editTextNumberDecimal);
         node2 = findViewById(R.id.editTextNumberDecimal2);
         textViewDist = findViewById(R.id.dist);
@@ -87,17 +89,6 @@ public class MatrixInput extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void onClick(View view) {
 
-        if (state == 0) {
-            String errorMessage = checkNodesNum();
-            if(errorMessage == null){
-            errorMessage = checkMatrix();
-            errorCheck(errorMessage);
-            }
-            else{
-                textView.setText(errorMessage);
-                textView.setTextColor(Color.parseColor("#ee3300"));
-            }
-        } else {
             String errorMessage = checkNodesNum();
             if(errorMessage == null){
              errorMessage = checkMatrix();
@@ -109,9 +100,8 @@ public class MatrixInput extends AppCompatActivity {
                 findPath();
             }
             else {
-                    textView.setText(errorMessage);
-                    textView.setTextColor(Color.parseColor("#ee3300"));
-                }
+                textView.setText(errorMessage);
+                textView.setTextColor(Color.parseColor("#ee3300"));
             }
         }
 
@@ -129,7 +119,7 @@ public class MatrixInput extends AppCompatActivity {
             textViewShortPath.setText(pathText);
             AllPaths allPaths = new AllPaths();
             String allPathText = "All paths : \n";
-            List<List<Integer>> paths = allPaths.allPathsSourceTarget(adjmatrix,input1, input2);
+            paths = allPaths.allPathsSourceTarget(adjmatrix,input1, input2);
             if(input1 != input2){
                 for (List<Integer> p: paths) {
                     for (Integer node:p ){
@@ -144,7 +134,15 @@ public class MatrixInput extends AppCompatActivity {
             }
 
             textViewAllPaths.setText(allPathText);
-        } else textViewDist.setText("There is no path");
+        } else {
+            textViewDist.setText("There is no path");
+            paths =null;
+        }
+        Path path = new Path();
+        path.setAdjMatrix(adjmatrix);
+        path.setPath(paths);
+        Intent intent = new Intent(MatrixInput.this, MatrixCalc.class);
+        startActivity(intent);
 
     }
     private boolean compareMatrix() {
@@ -164,7 +162,6 @@ public class MatrixInput extends AppCompatActivity {
             textView.setText("");
             prevMatrix = matrix;
             state = 1;
-            //infoContainer.setVisibility(View.VISIBLE);
         } else {
             textView.setText(errorMessage);
             textView.setTextColor(Color.parseColor("#ee3300"));
@@ -240,8 +237,6 @@ public class MatrixInput extends AppCompatActivity {
                         errorMessage = "Not existing node";
                         return errorMessage;
                 }
-
-
             }
             matrix[adjacencyMatrix[i][0]-1][adjacencyMatrix[i][1]-1] = adjacencyMatrix[i][2];
         }
@@ -273,7 +268,7 @@ public class MatrixInput extends AppCompatActivity {
 
         return errorMessage;
     }
-
+    
     @Override
     public void onBackPressed() {
         super.onBackPressed();

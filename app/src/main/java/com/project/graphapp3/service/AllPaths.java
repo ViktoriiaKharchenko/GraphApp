@@ -1,4 +1,4 @@
-package com.project.graphapp3;
+package com.project.graphapp3.service;
 
 import java.sql.Array;
 import java.util.ArrayList;
@@ -10,9 +10,10 @@ import java.util.Queue;
 public class AllPaths {
 
     private void dfs(int[][] graph, List<List<Integer>> result, List<Integer> path, int start,int end){
-//        if(path.contains(start)) {
-//            path.remove(path.size()-1);}
-        //else {
+        if(path.contains(start)) {
+            return;
+        }
+        else {
             path.add(start);
             if(start == end) result.add(new ArrayList(path));
             else
@@ -23,7 +24,7 @@ public class AllPaths {
             }
          if(path.size() != 0)
             path.remove(path.size()-1);
-    //    }
+      }
     }
 
     public List<List<Integer>> allPathsSourceTarget(int[][] graph,int start, int end) {
