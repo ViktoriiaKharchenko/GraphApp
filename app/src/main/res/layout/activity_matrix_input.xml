@@ -61,6 +61,7 @@
             android:id="@+id/loadFile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="uploadFile"
             android:text="Upload file" />
 
         <LinearLayout

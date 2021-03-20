@@ -1,7 +1,9 @@
 package com.project.graphapp3;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -20,7 +22,14 @@ import com.project.graphapp3.model.Path;
 import com.project.graphapp3.service.AllPaths;
 import com.project.graphapp3.service.Dijkstra;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class MatrixInput extends AppCompatActivity {
     TextView textView;
@@ -103,7 +112,25 @@ public class MatrixInput extends AppCompatActivity {
                 textView.setText(errorMessage);
                 textView.setTextColor(Color.parseColor("#ee3300"));
             }
-        }
+    }
+    public void uploadFile (View view){
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+
+        // Update with mime types
+        intent.setType("*/*");
+
+        // Update with additional mime types here using a String[].
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, 3);
+
+        // Only pick openable and local files. Theoretically we could pull files from google drive
+        // or other applications that have networked files, but that's unnecessary for this example.
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+
+        // REQUEST_CODE = <some-integer>
+        startActivityForResult(intent, 301);
+    }
+
 
     private void findPath(){
         textView.setText("");
@@ -136,36 +163,16 @@ public class MatrixInput extends AppCompatActivity {
             textViewAllPaths.setText(allPathText);
         } else {
             textViewDist.setText("There is no path");
-            paths =null;
+            paths = new ArrayList<>() ;
         }
         Path path = new Path();
         path.setAdjMatrix(adjmatrix);
         path.setPath(paths);
+        path.setNodesNum(nodesNum);
         Intent intent = new Intent(MatrixInput.this, MatrixCalc.class);
+        intent.putExtra("path",path);
         startActivity(intent);
 
-    }
-    private boolean compareMatrix() {
-        if (matrix == null || prevMatrix.length != matrix.length) {
-            return false;
-        }
-        for (int i = 0; i < matrix.length; i++) {
-            for (int j = 0; j < matrix[i].length; j++) {
-                if (matrix[i][j] != prevMatrix[i][j]) return false;
-            }
-        }
-        return true;
-    }
-
-    private void errorCheck(String errorMessage) {
-        if (errorMessage == null) {
-            textView.setText("");
-            prevMatrix = matrix;
-            state = 1;
-        } else {
-            textView.setText(errorMessage);
-            textView.setTextColor(Color.parseColor("#ee3300"));
-        }
     }
 
     private  String checkNodesNum(){
@@ -268,7 +275,7 @@ public class MatrixInput extends AppCompatActivity {
 
         return errorMessage;
     }
-    
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
