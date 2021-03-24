@@ -127,16 +127,19 @@ public class MatrixCalc extends AppCompatActivity {
     public class DrawGrafView extends View {
         public DrawGrafView(Context context) {
             super(context);
-            paintDots.setColor(Color.BLUE);
-            paintDots.setColor(Color.parseColor("#a11234"));
+           // paintDots.setColor(Color.BLUE);
+            paintDots.setColor(Color.parseColor("#e3f51b"));
             paintGraf.setColor(Color.BLACK);
-            paintGraf.setStrokeWidth(24);
-            paintText.setTextSize(32);
+            paintGraf.setStrokeWidth(20);
+            paintGraf2.setStrokeWidth(13);
+            paintGraf2.setColor(Color.BLACK);
+            paintText.setTextSize(40);
             paintText.setColor(Color.BLACK);
         }
 
         Paint paintDots = new Paint();
         Paint paintGraf = new Paint();
+        Paint paintGraf2 = new Paint();
         Paint paintText = new Paint();
 
         @Override
@@ -152,6 +155,7 @@ public class MatrixCalc extends AppCompatActivity {
             for (List<Integer> path : paths) {
                 paintPaths.setStrokeWidth(5);
                 paintPaths.setColor(Color.argb(255, (int) (Math.random() * 125 + 125), (int) (Math.random() * 125 + 125), (int) (Math.random() * 125 + 125)));
+                //paintPaths.setColor(Color.argb(255, (int) (Math.random() * 125 + 125), (int) (Math.random() * 125 + 125), (int) (Math.random() * 125 + 125)));
                 for (int i = 1; i < path.size(); i++) {
                     GraphDot dot1 = dots.get(path.get(i - 1));
                     GraphDot dot2 = dots.get(path.get(i));
@@ -177,7 +181,7 @@ public class MatrixCalc extends AppCompatActivity {
                     }catch (Exception e){
                         System.out.println();
                     }
-                    drawArrow1(canvas, paintGraf, dot.getX(), dot.getY(), anotherDot.getX(), anotherDot.getY());
+                    drawArrow1(canvas, paintGraf2, dot.getX(), dot.getY(), anotherDot.getX(), anotherDot.getY());
                 }
             }
         }
