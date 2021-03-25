@@ -1,9 +1,16 @@
 package com.project.graphapp3;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.provider.OpenableColumns;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,12 +26,21 @@ import com.project.graphapp3.model.Path;
 import com.project.graphapp3.service.AllPaths;
 import com.project.graphapp3.service.Dijkstra;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class MatrixInput extends AppCompatActivity {
     private static final String TAG = "MatrixInput";
     private static final int REQUEST_CODE = 6384; // onActivityResult request
+    private static final int PICKFILE_RESULT_CODE = 6384;
 
     TextView textView;
     TextView textViewDist;
@@ -124,21 +140,99 @@ public class MatrixInput extends AppCompatActivity {
     }
     private void saveFile(){
 
+
     }
     public void uploadFile(View view) {
+        Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+        chooseFile.setType("*/*");
+        chooseFile = Intent.createChooser(chooseFile, "Choose a file");
+        startActivityForResult(chooseFile, PICKFILE_RESULT_CODE);
 
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Uri uri = data.getData();
+        String src = uri.getPath();
+        if (requestCode == PICKFILE_RESULT_CODE && resultCode == Activity.RESULT_OK) {
+            Uri content_describer = data.getData();
+            //get the path
+            Log.d("Path???", content_describer.getPath());
 
-//        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-//        // Update with mime types
-//        intent.setType("*/*");
-//        // Update with additional mime types here using a String[].
-//        intent.putExtra(Intent.EXTRA_MIME_TYPES, 3);
-//        // Only pick openable and local files. Theoretically we could pull files from google drive
-//        // or other applications that have networked files, but that's unnecessary for this example.
-//        intent.addCategory(Intent.CATEGORY_OPENABLE);
-//        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-//        // REQUEST_CODE = <some-integer>
-//        startActivityForResult(intent, 301);
+            String aBuffer = "";
+                Cursor cursor = this.getContentResolver()
+                        .query(uri, null, null, null, null, null);
+                if (cursor != null && cursor.moveToFirst()) {
+
+                    // Note it's called "Display Name". This is
+                    // provider-specific, and might not necessarily be the file name.
+                    String displayName = cursor.getString(
+                            cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                    Log.i(TAG, "Display Name: " + displayName);
+
+                    int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
+                    // If the size is unknown, the value stored is null. But because an
+                    // int can't be null, the behavior is implementation-specific,
+                    // and unpredictable. So as
+                    // a rule, check if it's null before assigning to an int. This will
+                    // happen often: The storage API allows for remote files, whose
+                    // size might not be locally known.
+                    String size = null;
+                    if (!cursor.isNull(sizeIndex)) {
+                        // Technically the column stores an int, but cursor.getString()
+                        // will do the conversion automatically.
+                        size = cursor.getString(sizeIndex);
+                    } else {
+                        size = "Unknown";
+                    }
+                    Log.i(TAG, "Size: " + size);
+                    StringBuilder stringBuilder = new StringBuilder();
+                    try (InputStream inputStream =
+                                 getContentResolver().openInputStream(uri);
+                         BufferedReader reader = new BufferedReader(
+                                 new InputStreamReader(Objects.requireNonNull(inputStream)))) {
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            stringBuilder.append(line+"\n");
+                        }
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    setFields(stringBuilder.toString());//todo
+
+                }
+        }
+    }
+
+    private void setFields(String toString) {
+        String line = toString.substring(0, toString.indexOf("\n"));
+        if(line.split(",").length == 1){
+            nodesNumberText.setText(toString.substring(0, toString.indexOf("\n")));
+            toString = toString.substring(toString.indexOf("\n"));
+
+        }
+        line = toString.split("\n")[toString.split("\n").length-1];
+        if(line.split(",").length ==2){
+            node1.setText(line.split(",")[0]);
+            node2.setText(line.split(",")[1]);
+            toString = toString.substring(0,toString.lastIndexOf(line));
+        }
+        editMatrix.setText(toString.trim());
+
+    }
+
+    // IMPORTANT!!
+    public File getAppExternalFilesDir()  {
+        if (android.os.Build.VERSION.SDK_INT >= 29) {
+            // /storage/emulated/0/Android/data/org.o7planning.externalstoragedemo/files
+            return this.getExternalFilesDir(null);
+        } else {
+            // @Deprecated in API 29.
+            // /storage/emulated/0
+            return Environment.getExternalStorageDirectory();
+        }
     }
 
 
