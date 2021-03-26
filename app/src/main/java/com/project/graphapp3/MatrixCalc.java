@@ -42,9 +42,6 @@ public class MatrixCalc extends AppCompatActivity {
 
         testArray = path.getAdjMatrix();
         paths = path.getPath();
-//        Path path = new Path();
-//        adjMatrix = path.getAdjMatrix();
-//        paths = path.getPath();
         dots = new HashMap<>();
         calculateDots(dots, testArray, path.getNodesNum());
 
@@ -63,10 +60,6 @@ public class MatrixCalc extends AppCompatActivity {
         switch (id) {
             case R.id.action_info:
                 intent = new Intent(MatrixCalc.this, AboutActivity.class);
-                startActivity(intent);
-                return true;
-            case R.id.action_help:
-                intent = new Intent(MatrixCalc.this, HelpActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.action_main:

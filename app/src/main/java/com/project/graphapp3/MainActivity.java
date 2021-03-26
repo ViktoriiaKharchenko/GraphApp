@@ -39,10 +39,6 @@ public class MainActivity extends AppCompatActivity {
                 intent = new Intent(MainActivity.this, AboutActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.action_help:
-                intent = new Intent(MainActivity.this, HelpActivity.class);
-                startActivity(intent);
-                return true;
             case R.id.action_main:
                 intent = new Intent(MainActivity.this, MainActivity.class);
                 startActivity(intent);
@@ -53,5 +49,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void uploadFile(View view) {
+    }
+
+    public void goToGraph(View view) {
     }
 }

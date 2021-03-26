@@ -30,9 +30,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -42,6 +44,7 @@ public class MatrixInput extends AppCompatActivity {
     private static final int REQUEST_CODE = 6384; // onActivityResult request
     private static final int PICKFILE_RESULT_CODE = 6384;
 
+    Button drawGraphButton;
     TextView textView;
     TextView textViewDist;
     TextView textViewShortPath;
@@ -52,12 +55,7 @@ public class MatrixInput extends AppCompatActivity {
     EditText node1;
     EditText node2;
     LinearLayout infoContainer;
-
-    private static final String LOG_TAG = "AndroidExample";
-    private static final int MY_REQUEST_CODE_PERMISSION = 1000;
-    private static final int MY_RESULT_CODE_FILECHOOSER = 2000;
-    int state = 0;
-    int[][] prevMatrix;
+    String textInfo ;
     int[][] adjacencyMatrix;
     int[][] adjmatrix;
     int[][] matrix;
@@ -79,6 +77,7 @@ public class MatrixInput extends AppCompatActivity {
         textViewShortPath = findViewById(R.id.path);
         textViewAllPaths = findViewById(R.id.path2);
         nodesNumberText = findViewById(R.id.numberOfNodes);
+        drawGraphButton = findViewById(R.id.goToGraph);
     }
 
     @Override
@@ -103,10 +102,6 @@ public class MatrixInput extends AppCompatActivity {
         switch (id) {
             case R.id.action_info:
                 intent = new Intent(MatrixInput.this, AboutActivity.class);
-                startActivity(intent);
-                return true;
-            case R.id.action_help:
-                intent = new Intent(MatrixInput.this, HelpActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.action_main:
@@ -134,13 +129,58 @@ public class MatrixInput extends AppCompatActivity {
         if (errorMessage == null) {
             findPath();
         } else {
+            textViewAllPaths.setText("");
+            drawGraphButton.setVisibility(View.INVISIBLE);
             textView.setText(errorMessage);
             textView.setTextColor(Color.parseColor("#ee3300"));
         }
     }
     private void saveFile(){
+        String fullpath, foldername, filename;
+        foldername = "files/Downloads";
+        filename = "myFile.txt";
 
-
+        //Сохранение файла на External Storage:
+        fullpath = Environment.getExternalStorageDirectory().getAbsolutePath()
+                + "/" + foldername
+                + "/" + filename;
+        if (isExternalStorageWritable())
+        {
+            SaveFile(fullpath, "Этот текст сохранен на External Storage");
+        }
+    }
+    /* Проверяет, доступно ли external storage для чтения и записи */
+    public boolean isExternalStorageWritable()
+    {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state))
+        {
+            return true;
+        }
+        return false;
+    }
+    public void SaveFile (String filePath, String FileContent)
+    {
+        //Создание объекта файла.
+        File fhandle = new File(filePath);
+        try
+        {
+            //Если нет директорий в пути, то они будут созданы:
+            if (!fhandle.getParentFile().exists())
+                fhandle.getParentFile().mkdirs();
+            //Если файл существует, то он будет перезаписан:
+            fhandle.createNewFile();
+            FileOutputStream fOut = new FileOutputStream(fhandle);
+            OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+            myOutWriter.write(FileContent);
+            myOutWriter.close();
+            fOut.close();
+        }
+        catch (IOException e)
+        {
+            //e.printStackTrace();
+            textView.setText("Path " + filePath + ", " + e.toString());
+        }
     }
     public void uploadFile(View view) {
         Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
@@ -164,23 +204,14 @@ public class MatrixInput extends AppCompatActivity {
                         .query(uri, null, null, null, null, null);
                 if (cursor != null && cursor.moveToFirst()) {
 
-                    // Note it's called "Display Name". This is
-                    // provider-specific, and might not necessarily be the file name.
                     String displayName = cursor.getString(
                             cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                     Log.i(TAG, "Display Name: " + displayName);
 
                     int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
-                    // If the size is unknown, the value stored is null. But because an
-                    // int can't be null, the behavior is implementation-specific,
-                    // and unpredictable. So as
-                    // a rule, check if it's null before assigning to an int. This will
-                    // happen often: The storage API allows for remote files, whose
-                    // size might not be locally known.
                     String size = null;
                     if (!cursor.isNull(sizeIndex)) {
-                        // Technically the column stores an int, but cursor.getString()
-                        // will do the conversion automatically.
+
                         size = cursor.getString(sizeIndex);
                     } else {
                         size = "Unknown";
@@ -223,17 +254,17 @@ public class MatrixInput extends AppCompatActivity {
 
     }
 
-    // IMPORTANT!!
-    public File getAppExternalFilesDir()  {
-        if (android.os.Build.VERSION.SDK_INT >= 29) {
-            // /storage/emulated/0/Android/data/org.o7planning.externalstoragedemo/files
-            return this.getExternalFilesDir(null);
-        } else {
-            // @Deprecated in API 29.
-            // /storage/emulated/0
-            return Environment.getExternalStorageDirectory();
-        }
-    }
+//    // IMPORTANT!!
+//    public File getAppExternalFilesDir()  {
+//        if (android.os.Build.VERSION.SDK_INT >= 29) {
+//            // /storage/emulated/0/Android/data/org.o7planning.externalstoragedemo/files
+//            return this.getExternalFilesDir(null);
+//        } else {
+//            // @Deprecated in API 29.
+//            // /storage/emulated/0
+//            return Environment.getExternalStorageDirectory();
+//        }
+//    }
 
 
     private void findPath() {
@@ -268,6 +299,10 @@ public class MatrixInput extends AppCompatActivity {
             textViewDist.setText("There is no path");
             paths = new ArrayList<>();
         }
+        drawGraphButton.setVisibility(View.VISIBLE);
+    }
+
+    public void goToGraph(View view){
         Path path = new Path();
         path.setAdjMatrix(adjmatrix);
         path.setPath(paths);
@@ -275,7 +310,6 @@ public class MatrixInput extends AppCompatActivity {
         Intent intent = new Intent(MatrixInput.this, MatrixCalc.class);
         intent.putExtra("path", path);
         startActivity(intent);
-
     }
 
     private String checkNodesNum() {

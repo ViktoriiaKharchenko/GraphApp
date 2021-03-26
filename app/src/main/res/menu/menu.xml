@@ -16,11 +16,6 @@
         app:showAsAction="never"/>
 
     <item
-        android:id="@+id/action_help"
-        android:orderInCategory="100"
-        android:title="@string/action_help"
-        app:showAsAction="never"/>
-    <item
         android:id="@+id/action_save"
         android:icon="@android:drawable/stat_sys_download"
         android:title="Save"

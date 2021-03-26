@@ -24,7 +24,8 @@
             android:layout_marginRight="0dp"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:scrollbars="vertical">
+            android:scrollbars="vertical"
+            android:weightSum="100">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -52,8 +53,9 @@
 
             <TextView
                 android:id="@+id/textView2"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="70"
                 android:gravity="center"
                 android:textSize="20sp" />
 
@@ -141,19 +143,41 @@
                 android:id="@+id/dist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="70"
+                android:textColor="@color/cardview_dark_background"
+                android:gravity="center"
                 android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/path"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="70"
+                android:textColor="@color/cardview_dark_background"
+                android:gravity="center"
                 android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/path2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="70"
+                android:textColor="@color/cardview_dark_background"
+                android:gravity="center"
                 android:textSize="24sp" />
+
+            <Button
+                android:id="@+id/goToGraph"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="goToGraph"
+                android:text="Show graph"
+                android:visibility="invisible" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </ScrollView>
 

@@ -30,10 +30,6 @@ public class AboutActivity extends AppCompatActivity {
                 intent = new Intent(AboutActivity.this, AboutActivity.class);
                 startActivity(intent);
                 return true;
-            case R.id.action_help:
-                intent = new Intent(AboutActivity.this, HelpActivity.class);
-                startActivity(intent);
-                return true;
             case R.id.action_main:
                 intent = new Intent(AboutActivity.this, MainActivity.class);
                 startActivity(intent);
