@@ -7,8 +7,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.Menu;
@@ -27,14 +25,10 @@ import com.project.graphapp3.service.AllPaths;
 import com.project.graphapp3.service.Dijkstra;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -55,7 +49,6 @@ public class MatrixInput extends AppCompatActivity {
     EditText node1;
     EditText node2;
     LinearLayout infoContainer;
-    String textInfo ;
     int[][] adjacencyMatrix;
     int[][] adjmatrix;
     int[][] matrix;
@@ -93,6 +86,7 @@ public class MatrixInput extends AppCompatActivity {
         return true;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // получим идентификатор выбранного пункта меню
@@ -109,11 +103,25 @@ public class MatrixInput extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             case R.id.action_save:
-               saveFile();
+                AllPaths.FileUtils.saveStringToFile(findText(), this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private String findText() {
+        String text = nodesNumberText.getText().toString()+"\n";
+        text +=editMatrix.getText().toString()+"\n";
+        text+=node1.getText().toString() +"," + node2.getText().toString()+"\n";
+        if(textViewDist.getText().toString() != ""){
+            text+=textViewDist.getText().toString()+"\n";
+            if(textViewShortPath.getText().toString() != "" && textViewAllPaths.getText().toString()!=""){
+                text+= textViewShortPath.getText().toString()+"\n";
+                text+= textViewAllPaths.getText().toString();
+            }
+        }
+        return text;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -135,53 +143,8 @@ public class MatrixInput extends AppCompatActivity {
             textView.setTextColor(Color.parseColor("#ee3300"));
         }
     }
-    private void saveFile(){
-        String fullpath, foldername, filename;
-        foldername = "files/Downloads";
-        filename = "myFile.txt";
 
-        //Сохранение файла на External Storage:
-        fullpath = Environment.getExternalStorageDirectory().getAbsolutePath()
-                + "/" + foldername
-                + "/" + filename;
-        if (isExternalStorageWritable())
-        {
-            SaveFile(fullpath, "Этот текст сохранен на External Storage");
-        }
-    }
-    /* Проверяет, доступно ли external storage для чтения и записи */
-    public boolean isExternalStorageWritable()
-    {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state))
-        {
-            return true;
-        }
-        return false;
-    }
-    public void SaveFile (String filePath, String FileContent)
-    {
-        //Создание объекта файла.
-        File fhandle = new File(filePath);
-        try
-        {
-            //Если нет директорий в пути, то они будут созданы:
-            if (!fhandle.getParentFile().exists())
-                fhandle.getParentFile().mkdirs();
-            //Если файл существует, то он будет перезаписан:
-            fhandle.createNewFile();
-            FileOutputStream fOut = new FileOutputStream(fhandle);
-            OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-            myOutWriter.write(FileContent);
-            myOutWriter.close();
-            fOut.close();
-        }
-        catch (IOException e)
-        {
-            //e.printStackTrace();
-            textView.setText("Path " + filePath + ", " + e.toString());
-        }
-    }
+
     public void uploadFile(View view) {
         Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
         chooseFile.setType("*/*");

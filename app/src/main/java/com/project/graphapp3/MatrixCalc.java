@@ -19,7 +19,6 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.project.graphapp3.model.GraphDot;
 import com.project.graphapp3.model.Path;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +28,7 @@ public class MatrixCalc extends AppCompatActivity {
     Map<Integer, GraphDot> dots;
     List<List<Integer>> paths;
     int[][] adjMatrix;
+    float radius = 25;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -38,7 +38,7 @@ public class MatrixCalc extends AppCompatActivity {
         Intent intent = getIntent();
         Path path = (Path) intent.getExtras().get("path");
 
-        int testArray[][] ;
+        int testArray[][];
 
         testArray = path.getAdjMatrix();
         paths = path.getPath();
@@ -46,16 +46,18 @@ public class MatrixCalc extends AppCompatActivity {
         calculateDots(dots, testArray, path.getNodesNum());
 
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // получим идентификатор выбранного пункта меню
         int id = item.getItemId();
-        Intent intent ;
+        Intent intent;
         // Операции для выбранного пункта меню
         switch (id) {
             case R.id.action_info:
@@ -88,28 +90,27 @@ public class MatrixCalc extends AppCompatActivity {
 
     public double calculateDegree(float x1, float x2, float y1, float y2) {
         float startRadians = (float) Math.atan((y2 - y1) / (x2 - x1));
-        System.out.println("radian=====" + Math.toDegrees(startRadians));
         startRadians += ((x2 >= x1) ? 90 : -90) * Math.PI / 180;
         return Math.toDegrees(startRadians);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void calculateDots(Map<Integer, GraphDot> dots, int[][] dataArray,int unicDotAmount) {
-        float radius = 450;
-        int textDistance = 50;
+    private void calculateDots(Map<Integer, GraphDot> dots, int[][] dataArray, int unicDotAmount) {
+        float radius = 430;
+        int textDistance = 60;
         for (int i = 0; i < unicDotAmount; i++) {
             GraphDot dot = new GraphDot();
-                dot.setName(i+1);
-                dots.put(i+1, dot);
-                float x = (float) (Math.cos(i * 2 * Math.PI / unicDotAmount) * (radius) + radius + 100);
-                float y = (float) (Math.sin(i * 2 * Math.PI / unicDotAmount) * (radius) + radius + 100);
-                float textX = (float) (Math.cos(i * 2 * Math.PI / unicDotAmount) * (radius + textDistance) + radius + 100);
-                float textY = (float) (Math.sin(i * 2 * Math.PI / unicDotAmount) * (radius + textDistance) + radius + 100);
+            dot.setName(i + 1);
+            dots.put(i + 1, dot);
+            float x = (float) (Math.cos(i * 2 * Math.PI / unicDotAmount) * (radius) + radius + 100);
+            float y = (float) (Math.sin(i * 2 * Math.PI / unicDotAmount) * (radius) + radius + 100);
+            float textX = (float) (Math.cos(i * 2 * Math.PI / unicDotAmount) * (radius + textDistance) + radius + 100 + this.radius / 2.5);
+            float textY = (float) (Math.sin(i * 2 * Math.PI / unicDotAmount) * (radius + textDistance) + radius + 100 + this.radius / 2.5);
 
-                dot.setX(x);
-                dot.setY(y);
-                dot.setNameX(textX);
-                dot.setNameY(textY);
+            dot.setX(x);
+            dot.setY(y);
+            dot.setNameX(textX);
+            dot.setNameY(textY);
         }
 
         for (int i = 0; i < dataArray.length; i++) {
@@ -118,15 +119,17 @@ public class MatrixCalc extends AppCompatActivity {
     }
 
     public class DrawGrafView extends View {
+
         public DrawGrafView(Context context) {
             super(context);
-           // paintDots.setColor(Color.BLUE);
+            // paintDots.setColor(Color.BLUE);
             paintDots.setColor(Color.parseColor("#e3f51b"));
             paintGraf.setColor(Color.BLACK);
             paintGraf.setStrokeWidth(20);
             paintGraf2.setStrokeWidth(13);
             paintGraf2.setColor(Color.BLACK);
-            paintText.setTextSize(40);
+            paintText.setTextSize(50);
+            paintText.setTextAlign(Paint.Align.CENTER);
             paintText.setColor(Color.BLACK);
         }
 
@@ -160,7 +163,7 @@ public class MatrixCalc extends AppCompatActivity {
 
         private void drawPiks(Map<Integer, GraphDot> dots, Canvas canvas) {
             for (GraphDot dot : dots.values()) {
-                canvas.drawCircle(dot.getX(), dot.getY(), 25, paintDots);
+                canvas.drawCircle(dot.getX(), dot.getY(), radius, paintDots);
             }
         }
 
@@ -171,7 +174,7 @@ public class MatrixCalc extends AppCompatActivity {
                     GraphDot anotherDot = dots.get(n);
                     try {
                         canvas.drawLine(dot.getX(), dot.getY(), anotherDot.getX(), anotherDot.getY(), paintGraf);
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         System.out.println();
                     }
                     drawArrow1(canvas, paintGraf2, dot.getX(), dot.getY(), anotherDot.getX(), anotherDot.getY());
@@ -179,6 +182,7 @@ public class MatrixCalc extends AppCompatActivity {
             }
         }
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
